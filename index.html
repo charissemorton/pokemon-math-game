@@ -293,11 +293,12 @@ table.hs{width:100%;border-collapse:separate;border-spacing:0;background:#fff;bo
 
 <div class="overlay" id="pauseOv" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
   <div class="dialog">
-    <h2 id="pauseTitle">Paused</h2>
-    <button class="btn btn-red" onclick="resumeGame()">Resume</button>
+    <h2 id="pauseTitle">Menu</h2>
+    <p class="note" id="pauseNote" style="margin:0 0 8px"></p>
+    <button class="btn btn-red" onclick="resumeGame()">Keep playing</button>
+    <button class="btn" onclick="quitToMenu()">Main menu</button>
+    <button class="btn btn-ghost" onclick="restartGame()">Start over</button>
     <button class="btn btn-ghost" onclick="openHelp(true)">How to play</button>
-    <button class="btn btn-ghost" onclick="restartGame()">Restart</button>
-    <button class="btn btn-ghost" onclick="quitToMenu()">Quit to menu</button>
   </div>
 </div>
 <div class="overlay" id="helpOv" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
@@ -616,7 +617,7 @@ function renderGame(){
   const st=G.streak[G.cur]||0;
   let h=`<div class="hud"><div class="hud-left"><span class="hud-mode">${modeLabel()}${multi?`, round ${G.round}${G.tiebreak?' (tiebreaker)':` of ${G.rounds}`}`:''}</span>${st>=2?`<span class="streak">🔥 ${st} in a row</span>`:''}</div><div class="hud-right">`;
   if(G.timed)h+=`<div class="clock" id="clock" aria-label="Time left">${fmtClock()}</div>`;
-  h+=`<button class="btn btn-ghost btn-small" onclick="pauseGame()">Pause</button></div></div>`;
+  h+=`<button class="btn btn-ghost btn-small" onclick="pauseGame()" aria-label="Open menu">☰ Menu</button></div></div>`;
   if(multi){
     h+=`<div class="players">`;
     G.players.forEach((n,i)=>{
@@ -801,11 +802,11 @@ function tiebreaker(){
 }
 
 /* ---------- pause ---------- */
-function pauseGame(){if(!G||G.modal)return;G.paused=true;overlay('pauseOv',true)}
+function pauseGame(){if(!G||G.modal)return;G.paused=true;$('pauseNote').textContent=G.timed?'The clock is stopped while this is open.':'';overlay('pauseOv',true)}
 function resumeGame(){G.paused=false;overlay('pauseOv',false);const a=$('ans');if(a&&!a.disabled&&!TOUCH)a.focus()}
 function closeAllOverlays(){['pauseOv','helpOv','catchOv','roundOv','turnOv','infoOv'].forEach(id=>overlay(id,false))}
-function restartGame(){if(window.confirm('Restart this game? Your progress in this game will be lost.')){closeAllOverlays();startGame()}}
-function quitToMenu(){if(window.confirm('Quit to the menu? Your progress in this game will be lost. Pokémon you caught stay in your Pokédex.')){clearLater();stopClock();closeAllOverlays();G=null;showMenu()}}
+function restartGame(){if(window.confirm('Start this game over? Your points in this game will be lost.')){closeAllOverlays();startGame()}}
+function quitToMenu(){if(window.confirm('Leave this game and go to the main menu? Your points in this game will be lost. Pokémon you caught stay in your Pokédex.')){clearLater();stopClock();closeAllOverlays();G=null;showMenu()}}
 
 /* ---------- endings ---------- */
 function endSolo(){
